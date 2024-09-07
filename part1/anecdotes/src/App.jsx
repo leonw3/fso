@@ -23,7 +23,7 @@ const App = () => {
   const [points, setPoints] = useState(new Array(8).fill(0))
   const [selected, setSelected] = useState(0)
   const [maxIndex, setMaxIndex] = useState(0)
-
+  
   const handleVoteClick = () => {
     const copy = [...points]
     copy[selected] += 1   
