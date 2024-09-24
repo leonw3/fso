@@ -7,7 +7,7 @@ const App = (props) => {
   const [showAll, setShowAll] = useState(true)
 
   const addNote = (event) => {
-    event.preventDefault() //event.preventDefault() prevents browser from performing default action when form is submitted, usually a reload
+    event.preventDefault() //event.preventDefault() prevents the browser from performing default action when form is submitted, usually a reload
     console.log('button clicked', event.target)
     const noteObject = {
       content: newNote,
@@ -46,11 +46,7 @@ const App = (props) => {
   return (
     <div>
       <h1>Notes</h1>
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all' }
-        </button>
-      </div>
+
       {/* Same as */}
       {/* <div>
         <button onClick={() => {
@@ -63,6 +59,13 @@ const App = (props) => {
           show {buttonText}
         </button>
       </div> */}
+
+      <div>
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all' }
+        </button>
+      </div>
+
       <ul>
         {notesToShow.map(note => 
           <Note key={note.id} note={note} />
@@ -72,6 +75,7 @@ const App = (props) => {
         <input value={newNote} onChange={handleNoteChange}/>
         <button type="submit">save</button>  
       </form>
+      
     </div>
   )
 }
