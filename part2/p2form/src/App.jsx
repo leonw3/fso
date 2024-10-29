@@ -25,6 +25,20 @@ const App = () => {
 
   console.log('render', notes.length, 'notes'); // Log the number of notes being rendered
   
+  // Function to change importance of note 
+  const toggleImportanceOf = id => {
+    const url = `http://localhost:3001/notes/${id}`
+    const note = notes.find(n => n.id === id)
+    const changedNote = { ...note, important: !note.important }
+    
+    // Put sends the changed note to the backend web server, then gets a response 
+    axios.put(url, changedNote).then(response => {
+      // sets the component's notes state to a new array that contains all the items from the previous notes array, 
+      // except for the old note which is replaced by the updated version of it returned by the server:
+      setNotes(notes.map(n => n.id === id ? response.data : n))
+    })
+  }
+
   // Function to add a new note
   const addNote = (event) => {
     event.preventDefault(); // Prevent the default form submission behavior (page reload)
@@ -34,12 +48,15 @@ const App = () => {
     const noteObject = {
       content: newNote, // Set the content to the current newNote state
       important: Math.random() < 0.5, // Randomly assign importance (true or false)
-      id: String(notes.length + 1), // Assign a unique ID based on the current notes length
     };
 
-    // Update the notes state with the new note, concatenating it to the existing notes
-    setNotes(notes.concat(noteObject));
-    setNewNote(''); // Clear the input field by resetting newNote state
+    axios
+    .post('http://localhost:3001/notes', noteObject)
+    .then(response => {
+      // Update the notes state with the new note, concatenating it to the existing notes
+      setNotes(notes.concat(response.data));
+      setNewNote(''); // Clear the input field by resetting newNote state
+    })    
   };
 
   // Function to handle changes in the note input field
@@ -50,23 +67,9 @@ const App = () => {
   
   // Determine which notes to display based on the showAll state
   const notesToShow = showAll
-    ? notes // If showAll is true, show all notes
+    ? notes // ? means showALL is true, show all notes
     : notes.filter(note => note.important === true); // Otherwise, filter to show only important notes
 
-  // SAME AS
-  // let notesToShow;
-  // if (showAll == true) {
-  //   notesToShow = notes;
-  // } else {
-  //   notesToShow = notes.filter(note => note.important === true);
-  // }
-
-  // let buttonText;
-  // if (showAll == true) {
-  //   buttonText = 'important';
-  // } else {
-  //   buttonText = 'all';
-  // }
 
   // Return statement with the JSX to render the component
   return (
