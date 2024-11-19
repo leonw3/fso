@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { phonebookServices } from './services/phonebook'
-import axios from 'axios'
+import phonebookService from './services/phonebook'
 
 const Person = ({person}) => {
   return (
@@ -57,28 +56,25 @@ const App = () => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    axios
-      // HTTP GET method to retrieve data from server at specified address
-      .get('http://localhost:3001/persons')
-      // When promise is fulfilled, state is modifed with the data that is fetched using GET http method
-      // (Promise is a JavaScript object 
-      // that represents the eventual completion (or failure) 
-      // of an asynchronous operation and its resulting value)  
-      .then(response => {
-        setPersons(response.data);
-      })
+    phonebookService
+      .getAll()
+      .then(initialPersons => {setPersons(initialPersons)});
   }, [])
 
   const addPerson = (event) => {
     event.preventDefault();
     const containsName = persons.some(person => person.name === newName);
     if (!containsName) {
-      const newNameObject = {
+      const newPersonObject = {
         name: newName,
         number: newNumber,
         id: String(persons.length + 1),
       };
-      setPersons(persons.concat(newNameObject));
+      phonebookService
+        .create(newPersonObject)
+        .then(returnedPersonObject => {
+          setPersons(persons.concat(returnedPersonObject));
+        })
     }
     else {
       alert(`${newName} is already added to phonebook`); 
