@@ -6,6 +6,7 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
+// Adds a new note to the server / db.json
 const create = newPersonObject => {
   const request = axios.post(baseUrl, newPersonObject)
   return request.then(response => response.data);

@@ -1,104 +1,87 @@
-// Import necessary hooks and libraries from React and Axios
-import { useState, useEffect } from 'react'; // useState and useEffect are React hooks
-import axios from 'axios'; // Axios is a promise-based HTTP client for making requests
-import Note from './components/Note'; // Importing the Note component
+import { useState, useEffect } from 'react'
+import Note from './components/Note'
+import noteService from './services/notes'
 
-// Define the main App component
 const App = () => {
-  // State hooks to manage the application's state
-  const [notes, setNotes] = useState([]); // State for storing an array of notes
-  const [newNote, setNewNote] = useState('a new note...'); // State for managing the new note input
-  const [showAll, setShowAll] = useState(true); // State for toggling between showing all notes or just important ones
+  const [notes, setNotes] = useState([])
+  const [newNote, setNewNote] = useState('')
+  const [showAll, setShowAll] = useState(false)
 
-  // useEffect hook to fetch data when the component mounts
   useEffect(() => {
-    console.log('effect'); // Log a message indicating the effect is running
-    axios
-      // HTTP GET request to retrieve notes from the specified server URL
-      .get('http://localhost:3001/notes')
-      // Handle the response when the promise is fulfilled
-      .then(response => {
-        console.log('promise fulfilled'); // Log a message indicating the promise was fulfilled
-        setNotes(response.data); // Update the notes state with the fetched data
-      });
-  }, []); // Empty dependency array means this effect runs only once when the component mounts
+    noteService
+      .getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes)
+      })
+  }, [])
 
-  console.log('render', notes.length, 'notes'); // Log the number of notes being rendered
+  const addNote = (event) => {
+    event.preventDefault()
+    const noteObject = {
+      content: newNote,
+      important: Math.random() > 0.5,
+    }
   
-  // Function to change importance of note 
+    noteService
+      .create(noteObject)
+        .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
+      })
+  }
+
   const toggleImportanceOf = id => {
     const url = `http://localhost:3001/notes/${id}`
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important }
-    
-    // Put sends the changed note to the backend web server, then gets a response 
-    axios.put(url, changedNote).then(response => {
-      // sets the component's notes state to a new array that contains all the items from the previous notes array, 
-      // except for the old note which is replaced by the updated version of it returned by the server:
-      setNotes(notes.map(n => n.id === id ? response.data : n))
-    })
+  
+    noteService
+      .update(id, changedNote)
+        .then(returnedNote => {
+          setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+        })
+      .catch(error => {
+        alert(
+          `the note '${note.content}' was already deleted from server`
+        )
+        setNotes(notes.filter(n => n.id !== id))
+      })
   }
 
-  // Function to add a new note
-  const addNote = (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior (page reload)
-    console.log('button clicked', event.target); // Log the event target (button)
-
-    // Create a new note object with a random importance value
-    const noteObject = {
-      content: newNote, // Set the content to the current newNote state
-      important: Math.random() < 0.5, // Randomly assign importance (true or false)
-    };
-
-    axios
-    .post('http://localhost:3001/notes', noteObject)
-    .then(response => {
-      // Update the notes state with the new note, concatenating it to the existing notes
-      setNotes(notes.concat(response.data));
-      setNewNote(''); // Clear the input field by resetting newNote state
-    })    
-  };
-
-  // Function to handle changes in the note input field
   const handleNoteChange = (event) => {
-    console.log(event.target.value); // Log the current value of the input
-    setNewNote(event.target.value); // Update the newNote state with the input value
-  };
-  
-  // Determine which notes to display based on the showAll state
+    setNewNote(event.target.value)
+  }
+
   const notesToShow = showAll
-    ? notes // ? means showALL is true, show all notes
-    : notes.filter(note => note.important === true); // Otherwise, filter to show only important notes
+    ? notes
+    : notes.filter(note => note.important)
 
-
-  // Return statement with the JSX to render the component
   return (
     <div>
       <h1>Notes</h1>
-
-      {/* Button to toggle between showing all notes or only important ones */}
       <div>
-        <button onClick={() => setShowAll(!showAll)}> {/* Toggle showAll state */}
-          show {showAll ? 'important' : 'all'} {/* Display button text based on showAll state */}
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all' }
         </button>
-      </div>
-
+      </div>      
       <ul>
-        {/* Map over notesToShow array to render each Note component */}
         {notesToShow.map(note => 
-          <Note key={note.id} note={note} /> // Each Note component receives a unique key and the note data
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         )}
       </ul>
-
-      {/* Form to add a new note */}
-      <form onSubmit={addNote}> {/* Call addNote function on form submission */}
-        <input value={newNote} onChange={handleNoteChange}/> {/* Input field for new note */}
-        <button type="submit">save</button>  {/* Button to submit the form */}
-      </form>
-      
+      <form onSubmit={addNote}>
+        <input
+          value={newNote}
+          onChange={handleNoteChange}
+        />
+        <button type="submit">save</button>
+      </form> 
     </div>
-  );
+  )
 }
 
-// Export the App component as the default export
-export default App;
+export default App
