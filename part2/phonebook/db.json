@@ -1,34 +1,14 @@
 {
   "persons": [
     {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": "1"
+      "id": "bdfdb3a9-3c78-4e01-be1c-2aaaca2478f5",
+      "name": "Leon",
+      "number": "435345"
     },
     {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": "2"
-    },
-    {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": "3"
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": "4"
-    },
-    {
-      "id": "5",
-      "name": "Leon Wong",
-      "number": "454366"
-    },
-    {
-      "id": "6",
-      "name": "JAckie Wong ",
-      "number": "35463547456"
+      "id": "0bd9018e-3100-4e89-beff-9069fbeb4d80",
+      "name": "Leon ",
+      "number": "345345"
     }
   ]
 }

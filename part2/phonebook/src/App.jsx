@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react'
 import phonebookService from './services/phonebook'
+import { de } from 'date-fns/locale'
+import { v4 as uuidv4} from 'uuid'
 
-const Person = ({person}) => {
+const Person = ({person, deletePerson}) => {
   return (
-    <div>{person.name} {person.number}</div>
+    <div>
+      {person.name} {person.number}
+      <DeleteButton person={person} deletePerson={deletePerson}></DeleteButton>
+    </div>
+  )
+}
+
+const DeleteButton = ({person, deletePerson}) => {
+  return (
+    <button onClick={() => deletePerson(person)}>Delete</button>
   )
 }
 
@@ -31,7 +42,7 @@ const Form = ({addPerson, newName, handleNameChange, newNumber, handleNumberChan
   )
 }
 
-const Persons = ({persons, filter}) => {
+const Persons = ({persons, filter, deletePerson}) => {
   return (
     <div>
       {persons
@@ -43,7 +54,7 @@ const Persons = ({persons, filter}) => {
           else return person.name.toLowerCase().includes(filter.toLowerCase());
         })
         // Displaying filtered names 
-        .map(person => <Person key={person.id} person={person}/>)
+        .map(person => <Person key={person.id} person={person} deletePerson={deletePerson}/>)
       }
     </div>
   )
@@ -68,13 +79,38 @@ const App = () => {
       const newPersonObject = {
         name: newName,
         number: newNumber,
-        id: String(persons.length + 1),
+        id: uuidv4(),
       };
       phonebookService
         .create(newPersonObject)
         .then(returnedPersonObject => {
-          setPersons(persons.concat(returnedPersonObject));
+          setPersons(persons => persons.concat(returnedPersonObject));
         })
+    }
+    else if (containsName) {
+      const personThatExists = persons.find(p => p.name === newName);
+  
+      const updatedPerson = {
+        ...personThatExists,
+        number: newNumber, // Update the number directly
+      };
+
+      if (window.confirm(`${updatedPerson.name} already exists, replace the old number with a new one?`)) {
+        phonebookService
+        .replaceNumber(updatedPerson) // Assuming this updates the person on the backend
+        .then(returnedUpdatedPerson => {
+          // Since the backend returns the updated person, we can directly update the state
+          const updatedPersons = persons.map(person => 
+            person.id === returnedUpdatedPerson.id ? returnedUpdatedPerson : person
+          );
+
+          setPersons(persons => 
+            persons.map(person => 
+              person.id === returnedUpdatedPerson.id ? returnedUpdatedPerson : person
+            )
+          ); 
+        })
+      }
     }
     else {
       alert(`${newName} is already added to phonebook`); 
@@ -95,6 +131,16 @@ const App = () => {
     setFilter(event.target.value);
   }
 
+  const deletePerson = (person) => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      phonebookService
+      .remove(person.id)
+      .then(() => {
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -108,7 +154,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filter={filter}/>
+      <Persons persons={persons} filter={filter} deletePerson={deletePerson}/>
     </div>
   )
 }
