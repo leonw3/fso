@@ -99,11 +99,6 @@ const App = () => {
         phonebookService
         .replaceNumber(updatedPerson) // Assuming this updates the person on the backend
         .then(returnedUpdatedPerson => {
-          // Since the backend returns the updated person, we can directly update the state
-          const updatedPersons = persons.map(person => 
-            person.id === returnedUpdatedPerson.id ? returnedUpdatedPerson : person
-          );
-
           setPersons(persons => 
             persons.map(person => 
               person.id === returnedUpdatedPerson.id ? returnedUpdatedPerson : person
