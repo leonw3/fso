@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import phonebookService from './services/phonebook'
-import { de } from 'date-fns/locale'
 import { v4 as uuidv4} from 'uuid'
 
 const Person = ({person, deletePerson}) => {
