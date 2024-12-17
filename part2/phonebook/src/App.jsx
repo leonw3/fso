@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react'
 import phonebookService from './services/phonebook'
 import { v4 as uuidv4} from 'uuid'
+import { set } from 'date-fns';
+
+const Notification = ({message}) => {
+  if (message === '') return null;
+  
+  return (
+    <div className='notification'>
+      {message}
+    </div>
+  )
+}
 
 const Person = ({person, deletePerson}) => {
   return (
@@ -64,6 +75,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState('');
+  // const [error, setError] = useState(); 
 
   useEffect(() => {
     phonebookService
@@ -80,11 +93,14 @@ const App = () => {
         number: newNumber,
         id: uuidv4(),
       };
+
       phonebookService
         .create(newPersonObject)
         .then(returnedPersonObject => {
           setPersons(persons => persons.concat(returnedPersonObject));
         })
+
+      setMessage(`Added ${newName}`);
     }
     else if (containsName) {
       const personThatExists = persons.find(p => p.name === newName);
@@ -104,6 +120,15 @@ const App = () => {
             )
           ); 
         })
+        .catch(error => {
+          setMessage(`Information of '${updatedPerson.name}' has already been removed from the server`);
+          setTimeout(() => {setMessage('')}, 5000);
+          setPersons(persons => 
+            persons.filter(p => 
+              p.id !== updatedPerson.id
+            )
+          ); 
+        })
       }
     }
     else {
@@ -111,6 +136,7 @@ const App = () => {
     }
     setNewName('');
     setNewNumber('');
+    setTimeout(() => {setMessage('')}, 5000);
   }
 
   const handleNameChange = (event) => {
@@ -119,6 +145,8 @@ const App = () => {
 
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
+    setMessage(`Changed ${newName}'s number`);
+    setTimeout(() => {setMessage('')}, 5000);
   }
 
   const handleFilterChange = (event) => {
@@ -138,6 +166,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message}/>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
       <h2>Add new </h2>
       <Form 
