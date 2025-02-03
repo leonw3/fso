@@ -1,32 +1,14 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
   response.json(blogs)
 })
 
-// Moved to middleware.js
-// const getTokenFrom = request => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.startsWith('Bearer ')) {
-//     return authorization.replace('Bearer ', '')
-//   }
-//   return null
-// }
-
 blogsRouter.post('/', async (request, response) => {
   const body = request.body 
-
-  // Checking if token is valid using secret key
-  // const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  // Decoded token is equivalent to userForToken object in login.js since it decodes the token / returns the Object which the token was based on.
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid'} )
-  }
 
   // If likes property is missing from request then defaults to 0
   if (!request.body.hasOwnProperty('likes')) {
@@ -39,7 +21,8 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(400).json({ error: 'title or url properties missing from requrest' })
   }
 
-  const user = await User.findById(decodedToken.id)
+  // Get user from request object, processed through middleware
+  const user = request.user
   
   const blog = new Blog({
     title: body.title,
@@ -58,16 +41,18 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  const user = request.user
 
-  // Check for invalid token
-  if (!decodedToken.id) return response.status(401).json({ error: 'token invalid'} )
-  
   // Check to see if token id matches the id of the user who created the blog, if not return error
   const blog = await Blog.findById(request.params.id)
-  if (blog.user.toString() !== decodedToken.id.toString()) return response.status(401).json({ error: 'user id is invalid' })
+  if (blog.user.toString() !== user.id.toString()) return response.status(401).json({ error: 'user id is invalid' })
    
   await Blog.findByIdAndDelete(request.params.id)
+
+  // Deleting blog from the array of blogs user collection 
+  user.blogs = user.blogs.filter(potentialblogId => potentialblogId === blog._id)
+  await user.save()
+
   response.status(204).end()
 })
 

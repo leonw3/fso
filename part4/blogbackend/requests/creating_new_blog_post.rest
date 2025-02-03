@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRpbW15IiwiaWQiOiI2NzkzMTRkOWM2MmM1ODg1M2VlMzAyMmMiLCJpYXQiOjE3Mzg1ODczMjQsImV4cCI6MTczODU5MDkyNH0.iPfI9DZsTIXFV1l1You4pIlM8Nrumy4TK4_RdWo-IZA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRpbW15IiwiaWQiOiI2N2ExNTRkODYxMzJiYzYyYTgzODMzYzkiLCJpYXQiOjE3Mzg2MjY0MzcsImV4cCI6MTczODYzMDAzN30.1u2_MjF6C1qzgC5y9adHBY3rgppwxbgbNMSzNlMyp-c
 
 {
     "title": "alcaraz take a bow",
