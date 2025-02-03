@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRpbW15IiwiaWQiOiI2NzkzMTRkOWM2MmM1ODg1M2VlMzAyMmMiLCJpYXQiOjE3Mzg1ODEzODQsImV4cCI6MTczODU4NDk4NH0.m_myspYsjzM2bkd-VmNFdcMIdzSlylcNOFHupPHkgL4
+
+{
+    "title": "alcaraz take a bow",
+    "author": "chespiotta",
+    "url": "https://www.reddit.com/r/tennis/comments/1i38yum/alcaraz_take_a_bow/",
+    "likes": 647
+}

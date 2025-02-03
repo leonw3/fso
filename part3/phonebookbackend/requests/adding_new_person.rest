@@ -1,0 +1,8 @@
+# POST http://localhost:3001/api/persons
+POST https://fso-phonebook-backend-84yt.onrender.com/api/persons
+Content-Type: application/json
+
+{
+    "name": "Jack Doherty",
+    "number": "0416424242"
+}

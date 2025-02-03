@@ -1,0 +1,8 @@
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRpbW15IiwiaWQiOiI2NzkwYzc5OWFlZjA5ODFkMWMwZWNlMDYiLCJpYXQiOjE3Mzc1ODk4ODV9.cSAwMv3J963PVvagW2P4_1a784mTpZ_moJFCQRSUqqc
+
+{
+    "content": "Postman is good in testing backend",
+    "important": true
+}
