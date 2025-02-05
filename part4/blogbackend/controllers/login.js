@@ -39,13 +39,6 @@ loginRouter.post('/', async (request, response) => {
       username: user.username,
       name: user.name
     })
-
-    // Router sends back token to the REACT code
-    // {
-    //   "token": "<JWT_TOKEN>",
-    //   "username": "<USERNAME>",
-    //   "name": "<USER_NAME>"
-    // }
 })
 
 module.exports = loginRouter
